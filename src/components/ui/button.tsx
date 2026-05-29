@@ -55,17 +55,35 @@ function Button({
   variant = "default",
   size = "default",
   asChild = false,
+  style,
   ...props
 }: ButtonProps) {
   if (asChild) {
+    // Slot only accepts a plain CSSProperties object, not the function form
+    // that Base UI's Button supports. Coerce: only pass `style` to Slot if it's
+    // actually an object (not a function).
+    const slotStyle =
+      typeof style === "function" ? undefined : style
+
     return (
       <Slot
         data-slot="button"
         className={cn(buttonVariants({ variant, size, className }))}
+        style={slotStyle}
         {...props}
       />
     )
   }
+
+  return (
+    <ButtonPrimitive
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      style={style}
+      {...props}
+    />
+  )
+}
 
   return (
     <ButtonPrimitive
