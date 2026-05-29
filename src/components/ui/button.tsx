@@ -43,9 +43,8 @@ const buttonVariants = cva(
 type ButtonProps = ButtonPrimitive.Props &
   VariantProps<typeof buttonVariants> & {
     /**
-     * When true, the Button renders its child element (e.g. a Link) with the
-     * button styles applied. Useful for navigation links that should look
-     * like buttons.
+     * When true, the Button renders its child element
+     * (e.g. a Link) with button styles applied.
      */
     asChild?: boolean
   }
@@ -59,9 +58,6 @@ function Button({
   ...props
 }: ButtonProps) {
   if (asChild) {
-    // Slot only accepts a plain CSSProperties object, not the function form
-    // that Base UI's Button supports. Coerce: only pass `style` to Slot if it's
-    // actually an object (not a function).
     const slotStyle =
       typeof style === "function" ? undefined : style
 
@@ -80,15 +76,6 @@ function Button({
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }))}
       style={style}
-      {...props}
-    />
-  )
-}
-
-  return (
-    <ButtonPrimitive
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
       {...props}
     />
   )
