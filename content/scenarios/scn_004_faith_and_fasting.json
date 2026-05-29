@@ -1,0 +1,190 @@
+{
+  "id": "scn_004_faith_and_fasting",
+  "version": 1,
+  "meta": {
+    "title": "Faith and Fasting",
+    "profession": "pharmacy",
+    "setting": "community_pharmacy",
+    "difficulty": "intermediate",
+    "estimated_minutes": 7,
+    "learning_objectives": [
+      "Engage respectfully with a patient's religious belief without dismissing it",
+      "Communicate the medical risk of metformin non-adherence in plain language",
+      "Use motivational interviewing technique — ask, don't lecture",
+      "Recognise that 'winning the argument' and 'changing the behaviour' are different goals",
+      "Identify and activate culturally aligned allies in the patient's wider community"
+    ]
+  },
+  "patient": {
+    "display_name": "Mrs. Adekunle",
+    "age": 54,
+    "sex": "female",
+    "appearance": "Woman in her mid-fifties, dressed in a buba and wrapper with a headscarf. A regular customer. Looks tired and slightly anxious. Doesn't quite meet your eyes."
+  },
+  "start_node": "n1",
+  "nodes": {
+    "n1": {
+      "type": "scene",
+      "text": "Mrs. Adekunle, a regular customer, walks in. She places her usual prescription on the counter — metformin 500mg, one tablet twice daily. She doesn't quite meet your eyes. 'Pharmacist, please... before you give me the medicine, I want to ask you something. My religious leader said I should stop taking the metformin, that I will be healed if I have faith. I have not taken it for two weeks now. But this morning, I am feeling weak, and I am going to the toilet too much. Did I do something wrong?'",
+      "next": "n2"
+    },
+    "n2": {
+      "type": "decision",
+      "prompt": "How do you respond?",
+      "choices": [
+        {
+          "label": "'Madam, your religious leader is not a doctor. He should not be telling you to stop your medication. You need to take it.'",
+          "reputation": -3,
+          "reaction": "She nods slightly but her face closes off. You can see you've just become 'the pharmacist who insulted my leader.'",
+          "next": "n3"
+        },
+        {
+          "label": "'Madam, faith is important. If your leader said so, then you must have your reasons. But maybe you can take it when you are not at services?'",
+          "reputation": -4,
+          "reaction": "She looks relieved. 'Okay sir, thank you.' But you've just told her that intermittent metformin is fine. It isn't.",
+          "next": "n3"
+        },
+        {
+          "label": "'Madam, I hear you. Before we decide anything, let me check your sugar level here at the pharmacy — and tell me a bit more about what you've been feeling. Is that okay?'",
+          "reputation": 4,
+          "reaction": "She visibly relaxes. 'Yes sir, please check it.' She sits down. You haven't given any advice yet, but the conversation has changed shape.",
+          "next": "n3"
+        },
+        {
+          "label": "'Madam, you have to choose — either you trust your religious leader or you trust your doctor. You cannot do both.'",
+          "reputation": -5,
+          "reaction": "Her face hardens. 'I trust God first.' She gathers her things.",
+          "next": "n3"
+        }
+      ]
+    },
+    "n3": {
+      "type": "multi_select",
+      "prompt": "You take a moment to gather information. Pick up to 2.",
+      "max_selections": 2,
+      "choices": [
+        {
+          "label": "Check her random blood glucose with the pharmacy meter.",
+          "reveals": "RBG 14.2 mmol/L. Elevated, but not in critical range.",
+          "reputation": 2
+        },
+        {
+          "label": "'How are you feeling generally, apart from the urination? Any blurry vision, very dry mouth, weakness that feels unusual?'",
+          "reveals": "'Yes, my vision is blurry in the afternoons. And I have been thirsty even though I'm trying to fast — I shouldn't be feeling normal hunger.'",
+          "reputation": 2
+        },
+        {
+          "label": "'Can you tell me a little about what your leader said? I want to make sure I understand exactly what he meant.'",
+          "reveals": "'He said if I take the medicine, I am showing God I don't trust Him. He said many people in our place of worship have been healed of diabetes by faith. He wants me to come out and give testimony.'",
+          "reputation": 2
+        },
+        {
+          "label": "'Have you spoken to your doctor about stopping?'",
+          "reveals": "'No. I was afraid he would shout at me. And anyway, I wanted to obey my leader first.'",
+          "reputation": 1
+        },
+        {
+          "label": "'Is anyone in your faith community a nurse, doctor, or pharmacist? Anyone who would understand both the faith and the medicine?'",
+          "reveals": "'Yes... my cousin Aunty Funke. She is a nurse at LASUTH. She goes to my place of worship too.'",
+          "reputation": 2
+        }
+      ],
+      "next": "n4"
+    },
+    "n4": {
+      "type": "decision",
+      "prompt": "Based on what you now know, what do you say?",
+      "choices": [
+        {
+          "label": "'Madam, your sugar is high. You need to start the metformin today, and keep taking it. Forget what your leader said about that — he is not the one who will manage your health.'",
+          "reputation": -4,
+          "reaction": "She stiffens. 'My pastor is a man of God.' Her voice has changed. You are no longer her pharmacist; you are someone who attacked her leader.",
+          "outcome": "bad",
+          "next": "n5"
+        },
+        {
+          "label": "'Madam, I am not going to argue with your leader. But I want to tell you what I have seen with diabetes. When patients stop their medication, the sugar slowly damages the eyes, the kidneys, and the nerves — and by the time you can feel the damage, it is often already done. Many of my patients of faith take their medicine AND pray — they say medicine is one of the ways God answers prayer. Would you be willing to restart, while you also continue your prayers?'",
+          "reputation": 6,
+          "reaction": "She is quiet for a long moment. 'I... never thought about it that way. That the medicine could be God's answer.' She looks at the prescription in her hand differently now.",
+          "outcome": "good",
+          "next": "n5"
+        },
+        {
+          "label": "'Okay madam, let me just dispense your medicine. If you want to take it, take it. If not, that is your choice.'",
+          "reputation": -7,
+          "terminal": true,
+          "terminal_outcome": {
+            "outcome_text": "You hand over the metformin without further discussion. She thanks you politely and leaves. She does not take it. Three months later, you hear from a neighbour that Mrs. Adekunle has been admitted to LUTH with diabetic ketoacidosis and a foot ulcer that is not healing well. The window when your words mattered most was today, and you let it close in the name of 'respecting her choice.'",
+            "log": "Hospitalised — silent dispensing missed the moment that mattered",
+            "principle": "Respecting autonomy is not the same as withdrawing from the conversation. When a patient is making a medical decision based on incomplete information, the respectful thing is to make sure she has the complete information FIRST — then respect her choice. Walking away from the conversation in the name of respect is its own kind of harm. She came in asking 'did I do something wrong?' That is a request for guidance, not for silence.",
+            "expert_note": "Many Nigerian patients with chronic disease have stories of complications that began during a period of 'spiritual stopping' — fasting, deliverance, or faith-recommended discontinuation. The damage shows up months later, when nobody connects it back to the conversation that was never had. You are sometimes the only person who can connect it for her, in the moment she asks.",
+            "references": [
+              "Olorunfemi & Ojewole — Medication belief as correlate of adherence in Nigerian diabetics",
+              "PCN Code of Ethics — Counselling and patient communication"
+            ]
+          }
+        },
+        {
+          "label": "'Madam, let me call your doctor right now and let him speak to you about this.'",
+          "reputation": 0,
+          "reaction": "She shrinks. 'No, no — please don't call him.' You realise too late that calling her doctor in front of her felt like reporting her to a parent.",
+          "outcome": "bad",
+          "next": "n5"
+        }
+      ]
+    },
+    "n5": {
+      "type": "decision",
+      "prompt": "She is listening. She looks worried now, but not closed off. How do you close the conversation?",
+      "choices": [
+        {
+          "label": "'Madam, I want you to start the metformin today, with food. And I want you to see your doctor this week — tell him exactly what you told me. He will not shout at you. Also, speak to Aunty Funke. She will understand both sides. Is that okay?'",
+          "reputation": 5,
+          "reaction": "She nods slowly. 'Okay sir. I will talk to Aunty Funke today.' She tucks the prescription into her bag carefully, not like trash but like something important.",
+          "next": "n6"
+        },
+        {
+          "label": "'Just take the medicine and don't tell your leader.'",
+          "reputation": -3,
+          "reaction": "She looks uncomfortable. 'I cannot deceive him.' Whatever progress you made just rolled back.",
+          "next": "n6"
+        },
+        {
+          "label": "'Madam, please just think about what I said and decide for yourself. Take your time.'",
+          "reputation": 2,
+          "reaction": "She nods politely. You're not sure whether 'take your time' lands as respect or as 'I don't really care what you do.'",
+          "next": "n6"
+        },
+        {
+          "label": "'Madam, I will dispense your medicine. Please come back next week and let me know how you are doing — and bring your sugar log if you can.'",
+          "reputation": 4,
+          "reaction": "'Okay sir. I will come next week.' She has a follow-up date now. The conversation has structure.",
+          "next": "n6"
+        }
+      ]
+    },
+    "n6": {
+      "type": "outcome",
+      "good": {
+        "text": "Two weeks later, Mrs. Adekunle returns. Her morning sugars are coming down. She tells you she spoke to her cousin Aunty Funke, who explained that 'praying for healing' and 'taking the medicine in the meantime' are not contradictions. She also went back to her leader — not to confront him, but to ask him to pray FOR THE MEDICINE TO WORK. He agreed. 'Thank you, sir. You did not insult my leader, and you did not lie to me. That helped me think clearly.'",
+        "log": "Restarted metformin with faith intact. Family ally engaged."
+      },
+      "bad": {
+        "text": "A month later, you hear via the neighbourhood that Mrs. Adekunle was hospitalised. Her blood sugar went to 28 mmol/L; she came in dehydrated and confused, and was admitted for several days. She survived. She has not been back to your pharmacy — her family now collects her prescriptions instead. You replay the conversation in your head, wondering which sentence was the one that did not land.",
+        "log": "Hospitalised for hyperglycaemia after stopping metformin."
+      },
+      "next": "n7"
+    },
+    "n7": {
+      "type": "coaching",
+      "principle": "In a country where religious belief shapes health behaviour as strongly as it does in Nigeria, the pharmacist's job is not to replace the patient's faith leader in her decision-making. It's to make sure she has the medical information she needs to make her own decision — framed in a way that doesn't force her to choose between her faith and her body. Metformin's glucose-lowering effect builds and decays gradually: stopping for two weeks won't necessarily cause an acute crisis, but it lets HbA1c trend upward and accelerates long-term complications (retinopathy, nephropathy, neuropathy) by months or years.",
+      "expert_note": "The most effective Nigerian pharmacists in chronic-disease management treat the patient's wider community — her faith leader, her family, her cousin who happens to be a nurse — as collaborators rather than obstacles. Asking 'is there someone in your faith community who would understand both?' is often the single most powerful question in this conversation. It activates an ally inside her trust circle. The pharmacist who tries to BE that ally alone almost always loses.",
+      "references": [
+        "Olorunfemi & Ojewole (2018) — Medication belief as correlate of adherence in Nigerian diabetics",
+        "WHO — Diabetes management in faith-influenced communities",
+        "PCN Code of Ethics — Patient counselling and shared decision-making",
+        "Nigerian Diabetes Association — Guidelines on patient counselling"
+      ]
+    }
+  }
+}

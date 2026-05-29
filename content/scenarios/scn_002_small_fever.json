@@ -1,0 +1,190 @@
+{
+  "id": "scn_002_small_fever",
+  "version": 1,
+  "meta": {
+    "title": "Small Fever",
+    "profession": "pharmacy",
+    "setting": "community_pharmacy",
+    "difficulty": "easy",
+    "estimated_minutes": 6,
+    "learning_objectives": [
+      "Take a focused paediatric history before recommending OTC medication",
+      "Recognize when to ask about malaria and recommend RDT before antimalarial treatment",
+      "Calculate weight-based paracetamol dosing for a Nigerian infant",
+      "Recognize red-flag symptoms requiring referral",
+      "Counsel a worried Nigerian parent without dismissing her concern"
+    ]
+  },
+  "patient": {
+    "display_name": "Mrs. Okeke",
+    "age": 28,
+    "sex": "female",
+    "appearance": "Woman in her late 20s carrying an 18-month-old daughter on her back. She looks tired but not panicked."
+  },
+  "start_node": "n1",
+  "nodes": {
+    "n1": {
+      "type": "scene",
+      "text": "A woman in her late 20s walks in with a toddler tied to her back. She looks tired but not panicked. 'Ah pharmacist, thank God you dey. My pikin don get fever since yesterday. The chemist for our area say make I buy strong medicine, say paracetamol no strong enough. Wetin you fit recommend?' The toddler is awake, looking around, sucking her thumb.",
+      "next": "n2"
+    },
+    "n2": {
+      "type": "decision",
+      "prompt": "How do you respond?",
+      "choices": [
+        {
+          "label": "'Make I see her. How much she weigh?' — sell ibuprofen syrup, weight-based. A worried parent who feels heard becomes a loyal customer.",
+          "reputation": -3,
+          "reaction": "She nods quickly and starts hunting for cash in her wrapper.",
+          "next": "n3"
+        },
+        {
+          "label": "'Madam, that chemist is wrong. Paracetamol is enough. Just give her paracetamol.'",
+          "reputation": -2,
+          "reaction": "She frowns slightly. 'Okay sir, but is that really enough?'",
+          "next": "n3"
+        },
+        {
+          "label": "'Madam, sit down small. Make I ask you a few questions about your daughter first before we decide what she needs.'",
+          "reputation": 3,
+          "reaction": "She visibly relaxes. 'Thank you sir.' She sits down with the baby on her lap.",
+          "next": "n3"
+        },
+        {
+          "label": "'I cannot recommend anything without a doctor. Please take her to a clinic.'",
+          "reputation": -1,
+          "reaction": "She sighs. 'But the clinic far, and money no plenty. I just want medicine for the fever.'",
+          "next": "n3"
+        }
+      ]
+    },
+    "n3": {
+      "type": "multi_select",
+      "prompt": "You take a quick history. Ask up to 2 questions.",
+      "max_selections": 2,
+      "choices": [
+        {
+          "label": "'How long has the fever been there, and what have you given her so far?'",
+          "reveals": "'Started yesterday morning, about 36 hours now. I gave her one dose of Emzor paracetamol syrup last night, it brought the fever down for a few hours.'",
+          "reputation": 1
+        },
+        {
+          "label": "'Is she still eating, drinking, and playing when she's awake?'",
+          "reveals": "'She eats less, but she dey drink water well. She quiet pass normal, but she dey play small-small when she wake. She vomited one time this morning — only once.'",
+          "reputation": 1
+        },
+        {
+          "label": "'Any rash, convulsion, refusing to breastfeed or eat completely?'",
+          "reveals": "'No, no rash. She never convulse before. And she still dey drink water and chop small food.'",
+          "reputation": 1
+        },
+        {
+          "label": "'Have you tested for malaria? Malaria fit cause fever for small pikin like her.'",
+          "reveals": "'I never test am. You think na malaria?' She looks concerned but listens carefully.",
+          "reputation": 2
+        },
+        {
+          "label": "'How much does she weigh?'",
+          "reveals": "'About 10 kg at her last clinic visit two weeks ago.'",
+          "reputation": 1
+        }
+      ],
+      "next": "n4"
+    },
+    "n4": {
+      "type": "decision",
+      "prompt": "Based on what you know, what's your plan?",
+      "choices": [
+        {
+          "label": "Sell ibuprofen syrup, weight-based dose. Paracetamol clearly isn't enough.",
+          "reputation": -2,
+          "reaction": "Mrs. Okeke accepts the ibuprofen, but looks uncertain.",
+          "outcome": "bad",
+          "next": "n5"
+        },
+        {
+          "label": "Sell Emcold-P (paracetamol + chlorpheniramine) — covers fever and the 'cold' symptoms together.",
+          "reputation": -3,
+          "reaction": "She takes the combination eagerly. 'This one go work better abi?'",
+          "terminal": true,
+          "terminal_outcome": {
+            "outcome_text": "Five days later, Mrs. Okeke comes back — but not for advice. The Emcold-P made her daughter very sleepy. The baby refused feeds for almost a full day and became dehydrated. They had to rush her to a private clinic for IV fluids. Mrs. Okeke pays for her own iron tablets in silence and leaves. You watch her walk past your pharmacy on her way to a different chemist the following week.",
+            "log": "Hospitalized for dehydration — sedating OTC combo in a toddler",
+            "principle": "Combination products like paracetamol + chlorpheniramine (Emcold-P and similar) offer no antipyretic benefit over plain paracetamol and add sedation risk. In a child under 2, sedation can suppress feeding and lead to dehydration. WHO and BNF for Children both recommend single-agent paracetamol or ibuprofen as first-line antipyretics; combination 'cold and fever' products are not appropriate for routine paediatric fever.",
+            "expert_note": "Many Nigerian community pharmacies stock these combinations and they sell well — but selling well is not the same as being indicated. Your job is to know the difference.",
+            "references": [
+              "BNF for Children — Antipyretics in paediatric fever",
+              "WHO IMCI — Management of fever in children under 5"
+            ]
+          }
+        },
+        {
+          "label": "'Madam, this looks like a normal fever, but in Nigeria we always rule out malaria first. Let me do a malaria RDT — if positive, I'll give her Coartem; if negative, we continue with paracetamol at the correct dose, and I'll tell you the warning signs to come back for.'",
+          "reputation": 5,
+          "reaction": "She nods. 'Okay sir, do the test.' You perform the RDT — it's negative.",
+          "outcome": "good",
+          "next": "n5"
+        },
+        {
+          "label": "'She needs to see a doctor today, the fever is too much.'",
+          "reputation": -1,
+          "reaction": "She looks deflated. 'Ah, okay sir. We go try find money.'",
+          "outcome": "bad",
+          "next": "n5"
+        }
+      ]
+    },
+    "n5": {
+      "type": "decision",
+      "prompt": "You're explaining the plan to Mrs. Okeke. How do you do it?",
+      "choices": [
+        {
+          "label": "'Give her one spoon of paracetamol four times a day.'",
+          "reputation": 0,
+          "reaction": "She nods, but you can see she's not fully clear on the dose.",
+          "next": "n6"
+        },
+        {
+          "label": "'Emzor paracetamol syrup 125mg/5ml — give her 6ml every 4 to 6 hours, no more than 4 times in 24 hours. If after 3 days the fever is still there, or you see her getting too sleepy to wake easily, refusing to drink, convulsing, or developing a rash, come back here or go to a clinic immediately.'",
+          "reputation": 4,
+          "reaction": "She repeats the dose back to you, then writes it on her phone. 'Thank you sir. Now I dey clear.'",
+          "next": "n6"
+        },
+        {
+          "label": "'The chemist that told you paracetamol is weak doesn't know what he's saying. Just give her paracetamol.'",
+          "reputation": -2,
+          "reaction": "She nods politely but looks uncomfortable.",
+          "next": "n6"
+        },
+        {
+          "label": "'Continue the paracetamol. If it doesn't work, bring her back.'",
+          "reputation": 1,
+          "reaction": "'Okay sir.' She leaves but you're not sure she has all the details.",
+          "next": "n6"
+        }
+      ]
+    },
+    "n6": {
+      "type": "outcome",
+      "good": {
+        "text": "Three days later, Mrs. Okeke comes back to refill her own iron tablets. She mentions her daughter's fever broke on day two and she's eating normally now. 'The way you explained the medicine, even my husband followed it correctly. And the malaria test gave us peace of mind.' She brought her sister-in-law along for a different consultation.",
+        "log": "Recovered from viral fever — well counselled, malaria ruled out."
+      },
+      "bad": {
+        "text": "A week later, Mrs. Okeke returns. The combination you sold made the baby very sleepy — she stopped feeding for almost a day and got dehydrated. They had to take her to a private clinic for IV fluids. Mrs. Okeke is polite but doesn't ask for your advice anymore. She now goes to a different pharmacy.",
+        "log": "Lost trust — dehydration from inappropriate OTC combination."
+      },
+      "next": "n7"
+    },
+    "n7": {
+      "type": "coaching",
+      "principle": "Most paediatric fevers in well-looking, drinking, active Nigerian children are self-limiting viral illness — or malaria, which must be confirmed by RDT before treating with ACT (Nigerian national guideline since 2011). Paracetamol 15 mg/kg every 4–6 hours (max 4 doses in 24 hours) is the first-line antipyretic for infants and toddlers. 'Stronger' combination products like paracetamol + chlorpheniramine offer no antipyretic benefit and add sedation risk. Always give the caregiver clear red flags for return.",
+      "expert_note": "Nigerian mothers often shop for medical advice because they're anxious and want certainty. The pharmacist who explains the dose clearly, rules out malaria properly, and names the exact warning signs becomes the family's trusted resource for years.",
+      "references": [
+        "National Malaria Elimination Programme — National Guidelines for Diagnosis and Treatment of Malaria",
+        "BNF for Children — Paracetamol dosing",
+        "WHO IMCI — Management of fever in children under 5"
+      ]
+    }
+  }
+}

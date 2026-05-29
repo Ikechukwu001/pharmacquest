@@ -1,0 +1,174 @@
+{
+  "id": "scn_001_strong_drugs",
+  "version": 1,
+  "meta": {
+    "title": "Strong Drugs",
+    "profession": "pharmacy",
+    "setting": "community_pharmacy",
+    "difficulty": "intermediate",
+    "estimated_minutes": 7,
+    "learning_objectives": [
+      "Recognize NSAID + ACE inhibitor interaction",
+      "Identify self-medication as a red flag",
+      "Practice patient-centred counselling"
+    ]
+  },
+  "patient": {
+    "display_name": "Uncle Sunday",
+    "age": 62,
+    "sex": "male",
+    "appearance": "Man in his 60s, walking carefully, well-dressed"
+  },
+  "start_node": "n1",
+  "nodes": {
+    "n1": {
+      "type": "scene",
+      "text": "A man in his 60s walks in carrying a small folded paper. He smiles. 'Ah, my pharmacist! How are you today?' He places a prescription on the counter — Diclofenac 50mg, 1 tablet twice daily for 7 days, from an orthopaedic doctor. 'My knee has been disturbing me. And please, those BP drugs they gave me are not strong enough. Give me something stronger.'",
+      "next": "n2"
+    },
+    "n2": {
+      "type": "decision",
+      "prompt": "Uncle Sunday is standing at your counter. What do you do first?",
+      "choices": [
+        {
+          "label": "Take the prescription and start preparing the diclofenac.",
+          "reputation": -2,
+          "reaction": "He nods, but seems impatient.",
+          "next": "n3"
+        },
+        {
+          "label": "Ask what medications he's currently taking.",
+          "reputation": 2,
+          "reaction": "'Lisinopril 10mg and amlodipine 5mg each morning. But they are not working.'",
+          "next": "n3"
+        },
+        {
+          "label": "Tell him you'll fill the diclofenac but he needs a new BP prescription.",
+          "reputation": -1,
+          "reaction": "He sighs. 'But you are my pharmacist!'",
+          "next": "n3"
+        },
+        {
+          "label": "Ask him to sit, and review prescription + meds + concerns together.",
+          "reputation": 3,
+          "reaction": "He smiles, visibly relaxes, and sits down.",
+          "next": "n3"
+        }
+      ]
+    },
+    "n3": {
+      "type": "multi_select",
+      "prompt": "You can ask up to 2 questions or take 2 actions before deciding.",
+      "max_selections": 2,
+      "choices": [
+        {
+          "label": "Ask about current BP medications.",
+          "reveals": "Lisinopril 10mg + amlodipine 5mg daily.",
+          "reputation": 1
+        },
+        {
+          "label": "Ask about adherence — is he taking them daily?",
+          "reveals": "'Sometimes I forget. They are not working anyway.'",
+          "reputation": 1
+        },
+        {
+          "label": "Check his BP at the pharmacy machine.",
+          "reveals": "BP: 158/96 mmHg.",
+          "reputation": 1
+        },
+        {
+          "label": "Ask about herbal mixtures, bitters, or OTC drugs.",
+          "reveals": "'Yes, Action Bitters and one herbal mixture from my brother.'",
+          "reputation": 1
+        }
+      ],
+      "next": "n4"
+    },
+    "n4": {
+      "type": "decision",
+      "prompt": "Based on what you now know, what's your plan?",
+      "choices": [
+        {
+          "label": "Dispense the diclofenac as written. Advise BP adherence.",
+          "reputation": -5,
+          "terminal": true,
+          "terminal_outcome": {
+            "outcome_text": "You hand over the diclofenac with brief BP advice. Uncle Sunday thanks you and leaves. Twelve days later, his family rushes him into your pharmacy — ankle swelling, reduced urine output, BP 178/108. He's referred urgently to hospital with acute kidney injury. His son looks at you across the counter and asks quietly, 'Did you not see the lisinopril on his card?'",
+            "log": "Hospitalized — AKI from NSAID + ACE-i interaction",
+            "principle": "NSAIDs reduce the antihypertensive effect of ACE inhibitors and significantly increase the risk of acute kidney injury, especially in older patients. This combination is one of the most common preventable causes of AKI in community pharmacy practice. Always review the patient's full medication list before dispensing any new NSAID — even a simple one like diclofenac from a trusted prescriber.",
+            "expert_note": "Familiarity bias is one of the deadliest forces in community pharmacy. A regular customer with a 'simple' prescription is the patient you're most likely to harm if you skip your usual checks.",
+            "references": [
+              "BNF — NSAID and ACE inhibitor interactions",
+              "PCN Code of Ethics — Prescription verification"
+            ]
+          }
+        },
+        {
+          "label": "Refuse the diclofenac. Tell him to go back to the doctor.",
+          "reputation": -1,
+          "outcome": "bad",
+          "next": "n5"
+        },
+        {
+          "label": "Dispense with warnings + advise + follow up next week.",
+          "reputation": -2,
+          "outcome": "bad",
+          "next": "n5"
+        },
+        {
+          "label": "Hold off. Explain the NSAID + ACE-i interaction. Contact the prescriber. Counsel on adherence.",
+          "reputation": 5,
+          "outcome": "good",
+          "next": "n5"
+        }
+      ]
+    },
+    "n5": {
+      "type": "decision",
+      "prompt": "How do you explain things to Uncle Sunday?",
+      "choices": [
+        {
+          "label": "'You are not taking your meds properly. You must take them every day.'",
+          "reputation": 0,
+          "next": "n6"
+        },
+        {
+          "label": "'You've been skipping doses — that's why BP feels uncontrolled. Let me help you remember them.'",
+          "reputation": 2,
+          "next": "n6"
+        },
+        {
+          "label": "'BP is high today. I'll give you the diclofenac, just be careful.'",
+          "reputation": -3,
+          "next": "n6"
+        },
+        {
+          "label": "'Uncle, your meds are strong enough when taken daily. The diclofenac could worsen BP and kidneys — let me suggest we hold off and talk to your doctor for a safer option.'",
+          "reputation": 4,
+          "next": "n6"
+        }
+      ]
+    },
+    "n6": {
+      "type": "outcome",
+      "good": {
+        "text": "Two weeks later, Uncle Sunday's BP is 132/82. His knees are managed with paracetamol and physiotherapy after you spoke to his orthopaedic doctor. He brought his brother to your pharmacy.",
+        "log": "Recovered — BP controlled, no AKI"
+      },
+      "bad": {
+        "text": "Two weeks later, Uncle Sunday's family brings him in. Ankle swelling, reduced urine output, BP 178/108. He is referred urgently to hospital with suspected acute kidney injury.",
+        "log": "Hospitalized — AKI from NSAID + ACE-i"
+      },
+      "next": "n7"
+    },
+    "n7": {
+      "type": "coaching",
+      "principle": "NSAIDs reduce the antihypertensive effect of ACE inhibitors and increase the risk of acute kidney injury, especially in older patients. Prescription verification means checking the prescription against the patient's full clinical picture — not just whether it's legible.",
+      "expert_note": "In Nigerian community pharmacy, regular patients often self-escalate when BP feels uncontrolled. Almost always, the issue is adherence, not drug strength. Check adherence first.",
+      "references": [
+        "BNF — NSAID interactions",
+        "PCN Code of Ethics — Patient Counselling"
+      ]
+    }
+  }
+}

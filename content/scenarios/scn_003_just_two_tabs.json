@@ -1,0 +1,173 @@
+{
+  "id": "scn_003_just_two_tabs",
+  "version": 1,
+  "meta": {
+    "title": "Just Two Tabs",
+    "profession": "pharmacy",
+    "setting": "community_pharmacy",
+    "difficulty": "intermediate",
+    "estimated_minutes": 7,
+    "learning_objectives": [
+      "Refuse dispensing of a controlled substance without a valid prescription, professionally and firmly",
+      "De-escalate an aggressive customer without yielding clinically",
+      "Recognize signs of potential opioid misuse",
+      "Know the Nigerian regulatory framework on tramadol",
+      "Document and escalate appropriately when warranted"
+    ]
+  },
+  "patient": {
+    "display_name": "The customer",
+    "age": 35,
+    "sex": "male",
+    "appearance": "Mid-thirties, faded T-shirt and jeans. Slightly sweaty despite the AC. Eyes a bit red. Eye contact intense but darting."
+  },
+  "start_node": "n1",
+  "nodes": {
+    "n1": {
+      "type": "scene",
+      "text": "The pharmacy is moderately busy. A man in his mid-thirties walks up to the counter. He's in faded jeans and a T-shirt, sweating slightly, eyes a bit red. 'Bros, abeg, give me tramadol 225 — just two tabs. I no get prescription today, but I dey buy am for that other pharmacy down the road every week. No wahala for me. How much?' Behind him, two other customers wait their turn.",
+      "next": "n2"
+    },
+    "n2": {
+      "type": "decision",
+      "prompt": "How do you respond?",
+      "choices": [
+        {
+          "label": "'Oga, no problem. ₦X for two tabs. Anything else?' — he's a regular at the other place, no harm done.",
+          "reputation": -8,
+          "terminal": true,
+          "terminal_outcome": {
+            "outcome_text": "You hand over the tablets. The transaction takes 30 seconds. Two months later, NDLEA officers visit the pharmacy as part of a community sweep on tramadol diversion. They've been tracking purchases at the wholesaler that supplied the 225mg tablets — a strength not even legally approved in Nigeria. Your superintendent is questioned. The CCTV footage from your shop is requested. PCN opens an investigation into your fitness to practice. Your name is now on a list.",
+            "log": "PCN investigation opened — dispensed controlled substance without prescription",
+            "principle": "Dispensing tramadol (or any controlled medicine) without a valid prescription violates the PCN Code of Ethics AND Nigeria's National Policy for Controlled Medicines. The 'regular customer' defence has no legal weight whatsoever. Compounding the violation: 225mg tramadol is not an approved strength in Nigeria — only 50mg and 100mg are. Selling it means you also accepted unregistered product into your shop.",
+            "expert_note": "Pharmacists who lose their licence to tramadol diversion almost always describe the first sale as 'just a small thing for a regular.' The first sale is never the problem. It's the second, third, and fiftieth that follow when word spreads. By the time NDLEA arrives, the pattern is already in your CCTV.",
+            "references": [
+              "PCN Code of Ethics — Dispensing controlled medicines",
+              "National Policy for Controlled Medicines (2013)",
+              "NAFDAC notice — Approved strengths of tramadol in Nigeria (50mg, 100mg only)"
+            ]
+          }
+        },
+        {
+          "label": "'Bros, I cannot give you tramadol without a doctor's prescription. Do you have pain you want me to advise on?'",
+          "reputation": 4,
+          "reaction": "He stares at you. His jaw tightens. 'You no understand. I tell you I dey buy am every week.'",
+          "next": "n3"
+        },
+        {
+          "label": "'Why not try the pharmacy down the road, since they always give you?'",
+          "reputation": -3,
+          "reaction": "He shrugs. 'Dem no get this morning. Na why I come you.' He doesn't move.",
+          "next": "n3"
+        },
+        {
+          "label": "[Quietly] 'Oga, no shouting here. Just bring a prescription tomorrow and I will help you.'",
+          "reputation": -4,
+          "reaction": "He nods knowingly. 'Ah, na so we dey do am. I go bring something tomorrow.' He winks. You realise too late what you've just promised.",
+          "next": "n3"
+        }
+      ]
+    },
+    "n3": {
+      "type": "scene",
+      "text": "He leans on the counter, voice rising so the other customers can hear. 'What kind of pharmacist are you? I just want small thing. Are you saying I'm not a serious person? You don't know who I am. I can buy this whole shop.' The customers behind him have gone quiet. One pretends to read a label. The other watches openly.",
+      "next": "n4"
+    },
+    "n4": {
+      "type": "decision",
+      "prompt": "How do you hold the line?",
+      "choices": [
+        {
+          "label": "'Oga, please calm down. I understand you are frustrated. But by law, I cannot dispense tramadol without a prescription. It is not personal — it is the same for every customer that walks in.'",
+          "reputation": 5,
+          "reaction": "He's still angry, but the 'it is the same for everyone' lands. He looks at the other customers, then back at you. The volume drops a notch.",
+          "next": "n5"
+        },
+        {
+          "label": "[Raising your voice back] 'If you don't leave my shop, I will call security.'",
+          "reputation": 0,
+          "reaction": "He stares at you for a long moment. 'You no need shout. I dey go.' He starts to leave, but the room is tense.",
+          "next": "n5"
+        },
+        {
+          "label": "'Okay, okay — just this once. But don't tell anybody.'",
+          "reputation": -10,
+          "terminal": true,
+          "terminal_outcome": {
+            "outcome_text": "You hand over the tablets to make him leave. He pockets them, nods to the two other customers as he walks past, and exits. By evening, word has spread on the street that your pharmacy 'helps people when they need it.' Within a week, three new 'regulars' arrive asking for the same thing — and they specifically mention his name. Your reputation in the community now precedes you. PCN has not yet noticed, but it is only a matter of time.",
+            "log": "Caved under pressure — community now treats pharmacy as a source",
+            "principle": "A single exception under pressure becomes a pattern. The two customers behind him saw everything. Witnesses to one exception become advertisers for it. Holding the line every time, with every patient, is the only sustainable position. The cost of one hostile interaction is far less than the cost of becoming 'the pharmacy that breaks the rule sometimes.'",
+            "expert_note": "Aggressive customers are reading you. They escalate precisely to test whether you'll bend. The pharmacist who responds the same way under pressure as without it teaches the community that the rule is real. The pharmacist who folds trains the community to apply pressure.",
+            "references": [
+              "PCN Code of Ethics — Dispensing controlled medicines",
+              "National Policy for Controlled Medicines (2013)"
+            ]
+          }
+        },
+        {
+          "label": "'Please leave my shop.'",
+          "reputation": 1,
+          "reaction": "He huffs. 'Useless pharmacy.' He turns and walks out. The other customers exchange glances.",
+          "next": "n5"
+        }
+      ]
+    },
+    "n5": {
+      "type": "decision",
+      "prompt": "The aggression has faded. What do you do now?",
+      "choices": [
+        {
+          "label": "Let him leave without further engagement.",
+          "reputation": 1,
+          "reaction": "He walks out. The pharmacy is quiet again. The next customer steps forward, pretending not to have noticed anything.",
+          "outcome": "bad",
+          "next": "n6"
+        },
+        {
+          "label": "'Oga, if pain is your problem, there's a clinic two streets away. They can write a proper prescription. If something else is going on with the tramadol, there are services that can help — would you like the number?'",
+          "reputation": 5,
+          "reaction": "He pauses at the door. He doesn't take the number. But he nods, once, almost imperceptibly. Then he leaves.",
+          "outcome": "good",
+          "next": "n6"
+        },
+        {
+          "label": "Write the incident into your shop's logbook — date, time, his description, what was requested.",
+          "reputation": 3,
+          "reaction": "You jot down the details while it's fresh. If he returns, you'll have a record. If PCN ever audits, you'll have a record.",
+          "outcome": "good",
+          "next": "n6"
+        },
+        {
+          "label": "Call NDLEA immediately to report him.",
+          "reputation": -1,
+          "reaction": "The line is busy. You wait. Eventually you wonder whether a single hostile customer who didn't actually receive any drug warrants this level of escalation.",
+          "outcome": "bad",
+          "next": "n6"
+        }
+      ]
+    },
+    "n6": {
+      "type": "outcome",
+      "good": {
+        "text": "A week later, a fellow pharmacist from a shop two streets away mentions, in passing, that the same man tried to buy tramadol there — and was also refused. The community of pharmacists is quietly comparing notes. You've contributed to a more ethical local market. Whether he ever gets help for his dependence is uncertain. But you held the line, with dignity, and you offered him a way out. You did your part — professionally and humanely.",
+        "log": "Refused tramadol without prescription. Referred. License intact."
+      },
+      "bad": {
+        "text": "He leaves. You think the situation is closed. Two weeks later, he returns — this time with a forged prescription, asking for triple the quantity. The fact that he came back with confidence suggests someone, somewhere, dispensed for him after his outburst. You wonder whether your handling sent him a signal that you'd cave next time.",
+        "log": "Refused but communication unclear. Returned with forged prescription."
+      },
+      "next": "n7"
+    },
+    "n7": {
+      "type": "coaching",
+      "principle": "Tramadol has been a controlled substance in Nigeria since the 59th National Council on Health meeting in 2013. Only 50mg and 100mg strengths are legally approved — anything higher (225mg, 250mg) is unregistered and almost certainly diverted product. Dispensing without a valid prescription violates both the PCN Code of Ethics and Nigeria's National Policy for Controlled Medicines. The right response to pressure is always the same response you would give without pressure. Consistency under hostility is what protects your license and, sometimes, the patient.",
+      "expert_note": "Aggressive customers escalate because escalation has worked for them before. The pharmacist who responds the same way under pressure as without it teaches the community that the rule is real. The pharmacist who folds under pressure trains the community to apply pressure harder next time. Your tone matters: firm, not hostile; clear, not preachy. 'It is the same for every customer' depersonalises the refusal and gives the patient a face-saving exit.",
+      "references": [
+        "PCN Code of Ethics — Dispensing controlled medicines",
+        "National Policy for Controlled Medicines (2013, Federal Ministry of Health)",
+        "NAFDAC notice — Approved strengths of tramadol in Nigeria",
+        "NDLEA reporting channels for suspected diversion"
+      ]
+    }
+  }
+}
