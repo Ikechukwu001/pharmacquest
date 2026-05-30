@@ -93,7 +93,7 @@ export function ScenarioIntro({
           <video
             ref={videoRef}
             src={videoSrc}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             playsInline
             onEnded={onComplete}
             onError={onComplete}
