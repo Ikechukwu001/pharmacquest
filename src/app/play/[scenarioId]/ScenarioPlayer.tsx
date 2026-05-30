@@ -4,6 +4,8 @@
  * Manages player state and renders the appropriate UI for each node type.
  * Visual design: persistent patient card, thin progress bar, choice cards
  * with weight, and distinct visual treatment for terminal endings + coaching.
+ *
+ * Animated reputation badges float up from selected choices.
  */
 
 "use client";
@@ -20,6 +22,7 @@ import { recordCompletion } from "@/lib/scenarios/actions";
 import { PatientCard } from "@/components/scenario/PatientCard";
 import { ProgressIndicator } from "@/components/scenario/ProgressIndicator";
 import { ChoiceButton } from "@/components/scenario/ChoiceButton";
+import { ReputationFloater } from "@/components/scenario/ReputationFloater";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +44,7 @@ export function ScenarioPlayer({ scenario }: ScenarioPlayerProps) {
   const [terminalEnd, setTerminalEnd] = useState<TerminalOutcome | null>(null);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [recentRepDelta, setRecentRepDelta] = useState<number | null>(null);
 
   const currentNode = scenario.nodes[currentNodeId];
   if (!currentNode) {
@@ -68,6 +72,7 @@ export function ScenarioPlayer({ scenario }: ScenarioPlayerProps) {
     terminalOutcome?: TerminalOutcome
   ) {
     setReputation((prev) => prev + reputationDelta);
+    setRecentRepDelta(reputationDelta);
     setChoices((prev) => ({ ...prev, [currentNodeId]: choiceIndex }));
 
     if (terminalOutcome) {
@@ -86,6 +91,7 @@ export function ScenarioPlayer({ scenario }: ScenarioPlayerProps) {
     nextNodeId: string
   ) {
     setReputation((prev) => prev + reputationDelta);
+    setRecentRepDelta(reputationDelta);
     setChoices((prev) => ({ ...prev, [currentNodeId]: selectedIndices }));
     advance(nextNodeId);
   }
@@ -137,26 +143,33 @@ export function ScenarioPlayer({ scenario }: ScenarioPlayerProps) {
         {/* Persistent patient card */}
         <PatientCard patient={scenario.patient} />
 
-        {/* Current scene/decision */}
-        {terminalEnd ? (
-          <TerminalEndRenderer
-            terminalOutcome={terminalEnd}
-            onSave={saveCompletion}
-            saveState={saveState}
-            saveError={saveError}
+        {/* Current scene/decision (with reputation floater anchored above) */}
+        <div className="relative">
+          <ReputationFloater
+            delta={recentRepDelta}
+            onComplete={() => setRecentRepDelta(null)}
           />
-        ) : (
-          <NodeRenderer
-            node={currentNode}
-            outcome={outcome}
-            onDecisionChoice={handleDecisionChoice}
-            onMultiSelect={handleMultiSelect}
-            onAdvance={advance}
-            onScenarioEnd={saveCompletion}
-            saveState={saveState}
-            saveError={saveError}
-          />
-        )}
+
+          {terminalEnd ? (
+            <TerminalEndRenderer
+              terminalOutcome={terminalEnd}
+              onSave={saveCompletion}
+              saveState={saveState}
+              saveError={saveError}
+            />
+          ) : (
+            <NodeRenderer
+              node={currentNode}
+              outcome={outcome}
+              onDecisionChoice={handleDecisionChoice}
+              onMultiSelect={handleMultiSelect}
+              onAdvance={advance}
+              onScenarioEnd={saveCompletion}
+              saveState={saveState}
+              saveError={saveError}
+            />
+          )}
+        </div>
       </main>
     </div>
   );
