@@ -6,8 +6,8 @@
  *   - "calm": gentle pulse, close camera, deep-water feel (login)
  *   - "energetic": wider pulse, farther camera, more motion (signup)
  *
- * Built entirely from procedural geometry — no asset files.
- * Lazy-loaded and gated by WebGL detection upstream.
+ * Wave shape uses a proper PQRST approximation, not crude spikes.
+ * Scroll speed is intentionally slow — meditative, not frantic.
  */
 
 "use client";
@@ -21,34 +21,80 @@ interface EcgLineSceneProps {
 }
 
 /**
- * The actual ECG line — a series of 3D points connected as a line,
- * scrolling smoothly to simulate a heartbeat traveling across the screen.
+ * Produces an authentic-looking ECG waveform Y value for a given X.
+ * The cycle (one heartbeat) is `cycleLength` units wide.
+ *   P wave: gentle bump (atrial depolarization)
+ *   PR segment: flat
+ *   QRS complex: small Q dip, big R peak, small S dip (ventricular contraction)
+ *   ST segment: flat
+ *   T wave: rounded bump (ventricular repolarization)
+ *   Then long flat baseline before next cycle.
  */
+function pqrstWave(x: number, cycleLength: number, amplitude: number): number {
+  // Find position within current heartbeat cycle (0 to cycleLength)
+  const t = ((x % cycleLength) + cycleLength) % cycleLength;
+
+  // P wave: small bump from t=0.05 to t=0.15
+  if (t > 0.05 && t < 0.15) {
+    const p = (t - 0.05) / 0.10;
+    return Math.sin(p * Math.PI) * amplitude * 0.18;
+  }
+
+  // PR segment: flat baseline t=0.15 to t=0.25 (return 0)
+
+  // QRS complex: t=0.25 to t=0.35
+  //   Q dip at t=0.25-0.27
+  //   R peak at t=0.27-0.30
+  //   S dip at t=0.30-0.34
+  if (t >= 0.25 && t < 0.27) {
+    const q = (t - 0.25) / 0.02;
+    return -q * amplitude * 0.25;
+  }
+  if (t >= 0.27 && t < 0.30) {
+    const r = (t - 0.27) / 0.03;
+    // R wave: sharp upward spike — interpolate from -0.25 to peak then back
+    return -amplitude * 0.25 + r * amplitude * 1.25;
+  }
+  if (t >= 0.30 && t < 0.34) {
+    const s = (t - 0.30) / 0.04;
+    return amplitude - s * amplitude * 1.4;
+  }
+
+  // ST segment: brief flat t=0.34 to t=0.42
+
+  // T wave: rounded bump t=0.42 to t=0.58
+  if (t >= 0.42 && t < 0.58) {
+    const p = (t - 0.42) / 0.16;
+    return Math.sin(p * Math.PI) * amplitude * 0.30;
+  }
+
+  // Long quiet baseline t=0.58 to cycleLength
+  return 0;
+}
+
 function EcgLine({ variant = "calm" }: EcgLineSceneProps) {
   const lineRef = useRef<THREE.Line>(null);
   const glowRef = useRef<THREE.Mesh>(null);
 
-  // Density and amplitude differ between variants for the "calm vs energetic" feel
   const config = useMemo(() => {
     if (variant === "energetic") {
       return {
-        pointCount: 240,
-        baseAmplitude: 0.35,
-        spikeAmplitude: 1.6,
+        pointCount: 400,
+        amplitude: 0.9,
+        cycleLength: 1.4,
         scrollSpeed: 0.45,
-        spikeInterval: 28,
+        xSpan: 14,
       };
     }
     return {
-      pointCount: 200,
-      baseAmplitude: 0.15,
-      spikeAmplitude: 1.1,
+      pointCount: 400,
+      amplitude: 0.7,
+      cycleLength: 1.8,
       scrollSpeed: 0.28,
-      spikeInterval: 34,
+      xSpan: 12,
     };
   }, [variant]);
 
-  // Pre-compute the geometry once. We'll mutate points each frame for the scroll.
   const { geometry, positions } = useMemo(() => {
     const positions = new Float32Array(config.pointCount * 3);
     const geometry = new THREE.BufferGeometry();
@@ -56,51 +102,26 @@ function EcgLine({ variant = "calm" }: EcgLineSceneProps) {
     return { geometry, positions };
   }, [config.pointCount]);
 
-  // Generate ECG-like Y values for a given index along the scrolling line
-  function ecgWave(index: number, time: number): number {
-    const scrolled = index + time * config.scrollSpeed * 10;
-    const cyclePosition = scrolled % config.spikeInterval;
-
-    // Most of the line is a low, gentle wave (baseline)
-    const baseline = Math.sin(scrolled * 0.18) * config.baseAmplitude;
-
-    // Every `spikeInterval` points, generate the QRS spike (the iconic heartbeat shape)
-    if (cyclePosition >= 0 && cyclePosition < 6) {
-      const spikeProgress = cyclePosition / 6;
-      // Q dip → R peak → S dip in a compressed window
-      const spike =
-        spikeProgress < 0.25
-          ? -spikeProgress * 4 * config.spikeAmplitude * 0.3
-          : spikeProgress < 0.5
-          ? (spikeProgress - 0.25) * 4 * config.spikeAmplitude
-          : spikeProgress < 0.75
-          ? (0.75 - spikeProgress) * 4 * config.spikeAmplitude * 0.6
-          : -(spikeProgress - 0.75) * 4 * config.spikeAmplitude * 0.2;
-      return baseline + spike;
-    }
-
-    return baseline;
-  }
-
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
-    const xSpan = 14; // total horizontal width of the line in world units
+    const scrollOffset = time * config.scrollSpeed;
 
     for (let i = 0; i < config.pointCount; i++) {
-      const x = (i / config.pointCount) * xSpan - xSpan / 2;
-      const y = ecgWave(i, time);
-      const z = 0;
-      positions[i * 3] = x;
+      const xPos = (i / config.pointCount) * config.xSpan - config.xSpan / 2;
+      // Add scroll offset to make wave move horizontally over time
+      const waveX = xPos + scrollOffset;
+      const y = pqrstWave(waveX, config.cycleLength, config.amplitude);
+      positions[i * 3] = xPos;
       positions[i * 3 + 1] = y;
-      positions[i * 3 + 2] = z;
+      positions[i * 3 + 2] = 0;
     }
 
     geometry.attributes.position.needsUpdate = true;
 
-    // Subtle pulse on the glow
+    // Gentle breathing on the glow
     if (glowRef.current) {
-      const pulse = 1 + Math.sin(time * 2) * 0.05;
-      glowRef.current.scale.set(pulse, pulse, 1);
+      const breathe = 1 + Math.sin(time * 1.2) * 0.04;
+      glowRef.current.scale.set(breathe, breathe, 1);
     }
   });
 
@@ -108,22 +129,16 @@ function EcgLine({ variant = "calm" }: EcgLineSceneProps) {
     <group>
       {/* Soft horizontal glow behind the line */}
       <mesh ref={glowRef} position={[0, 0, -0.5]}>
-        <planeGeometry args={[14, 0.6]} />
-        <meshBasicMaterial
-          color="#2563eb"
-          transparent
-          opacity={0.12}
-        />
+        <planeGeometry args={[config.xSpan, 1.2]} />
+        <meshBasicMaterial color="#2563eb" transparent opacity={0.15} />
       </mesh>
 
-      {/* The line itself */}
       <primitive
         object={
           new THREE.Line(
             geometry,
             new THREE.LineBasicMaterial({
               color: variant === "energetic" ? "#60a5fa" : "#93c5fd",
-              linewidth: 2,
               transparent: true,
               opacity: 0.95,
             })
@@ -141,7 +156,7 @@ function EcgLine({ variant = "calm" }: EcgLineSceneProps) {
 function BackgroundGrid() {
   const lines = useMemo(() => {
     const arr = [];
-    for (let i = -5; i <= 5; i++) {
+    for (let i = -3; i <= 3; i++) {
       arr.push(i);
     }
     return arr;
@@ -152,29 +167,26 @@ function BackgroundGrid() {
       {lines.map((y) => (
         <mesh key={`h-${y}`} position={[0, y, -1]}>
           <planeGeometry args={[20, 0.005]} />
-          <meshBasicMaterial color="#1e3a8a" transparent opacity={0.25} />
+          <meshBasicMaterial color="#1e3a8a" transparent opacity={0.2} />
         </mesh>
       ))}
     </group>
   );
 }
 
-/**
- * Drifting particles in the background for depth.
- */
-function AmbientParticles({ count = 40 }: { count?: number }) {
+function AmbientParticles({ count = 30 }: { count?: number }) {
   const meshRef = useRef<THREE.InstancedMesh>(null);
 
   const dummies = useMemo(() => {
     const arr = [];
     for (let i = 0; i < count; i++) {
       arr.push({
-        baseX: (Math.random() - 0.5) * 16,
-        baseY: (Math.random() - 0.5) * 8,
+        baseX: (Math.random() - 0.5) * 14,
+        baseY: (Math.random() - 0.5) * 5,
         z: -Math.random() * 4 - 1,
-        speed: 0.05 + Math.random() * 0.1,
+        speed: 0.04 + Math.random() * 0.08,
         phase: Math.random() * Math.PI * 2,
-        scale: 0.02 + Math.random() * 0.04,
+        scale: 0.025 + Math.random() * 0.04,
       });
     }
     return arr;
@@ -201,11 +213,8 @@ function AmbientParticles({ count = 40 }: { count?: number }) {
   );
 }
 
-/**
- * The full scene.
- */
 export function EcgLineScene({ variant = "calm" }: EcgLineSceneProps) {
-  const cameraZ = variant === "energetic" ? 7 : 5.5;
+  const cameraZ = variant === "energetic" ? 6 : 5;
 
   return (
     <div className="w-full h-full">
@@ -214,11 +223,9 @@ export function EcgLineScene({ variant = "calm" }: EcgLineSceneProps) {
         dpr={[1, 2]}
         gl={{ antialias: true, alpha: true }}
       >
-        {/* Minimal lighting — line materials are mostly self-lit */}
         <ambientLight intensity={0.5} />
-
         <BackgroundGrid />
-        <AmbientParticles count={variant === "energetic" ? 50 : 30} />
+        <AmbientParticles count={variant === "energetic" ? 35 : 25} />
         <EcgLine variant={variant} />
       </Canvas>
     </div>
