@@ -25,6 +25,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { PillBottleSceneLazy } from "@/components/scene/PillBottleSceneLazy";
 
 export default async function HomePage() {
   const supabase = await createClient();
@@ -99,6 +100,11 @@ export default async function HomePage() {
             )}
           </div>
 
+          {/* 3D scene — daily welcome moment */}
+          <div className="w-full h-56 sm:h-64 rounded-xl overflow-hidden bg-gradient-to-br from-primary-700 to-primary-900 shadow-md">
+            <PillBottleSceneLazy />
+          </div>
+
           {nextScenario && (
             <Card className="bg-primary-500 text-white border-0 shadow-md">
               <CardHeader className="pb-3">
@@ -126,26 +132,6 @@ export default async function HomePage() {
               </CardContent>
             </Card>
           )}
-        </section>
-
-        {/* Stats */}
-        <section className="grid grid-cols-3 gap-3">
-          <StatTile
-            label="Reputation"
-            value={reputation.toString()}
-            sublabel={rank.title}
-          />
-          <StatTile
-            label="Streak"
-            value={streak.toString()}
-            sublabel={streak === 1 ? "day" : "days"}
-            accent={streak >= 3}
-          />
-          <StatTile
-            label="Casebook"
-            value={(patientLog?.length ?? 0).toString()}
-            sublabel={patientLog?.length === 1 ? "patient" : "patients"}
-          />
         </section>
 
         {/* Rank progress (only if not at top rank) */}
