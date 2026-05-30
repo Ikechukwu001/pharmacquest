@@ -30,10 +30,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
   if (user) redirect("/");
 
   return (
-    <AuthShell
-      marketingTitle="Welcome back. The casebook waits."
-      marketingBody="Pick up where you left off. Every patient you handle makes the next one easier."
-    >
+<AuthShell variant="calm">
       <div className="space-y-7">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Log in</h1>

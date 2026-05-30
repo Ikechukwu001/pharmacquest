@@ -44,10 +44,7 @@ export default async function WelcomePage({ searchParams }: PageProps) {
   const defaultName = profile?.display_name ?? user.email?.split("@")[0] ?? "";
 
   return (
-    <AuthShell
-      marketingTitle="One last thing before you start."
-      marketingBody="Tell us who you are so we can match scenarios to your level. Takes 20 seconds."
-    >
+<AuthShell variant="calm">
       <div className="space-y-7">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">Welcome to Pharmacquest</h1>

@@ -31,10 +31,7 @@ export default async function SignUpPage({ searchParams }: PageProps) {
   if (user) redirect("/");
 
   return (
-    <AuthShell
-      marketingTitle="Train your pharmacy brain — one case at a time."
-      marketingBody="Realistic clinical scenarios from Nigerian community pharmacy. Learn to think under pressure, without the consequences of getting it wrong on a real patient."
-    >
+<AuthShell variant="energetic">
       <div className="space-y-7">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold tracking-tight">
