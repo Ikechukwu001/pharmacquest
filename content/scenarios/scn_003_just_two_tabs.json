@@ -13,7 +13,8 @@
       "Recognize signs of potential opioid misuse",
       "Know the Nigerian regulatory framework on tramadol",
       "Document and escalate appropriately when warranted"
-    ]
+    ],
+    "intro_video": "/videos/intro_just_two_tabs.mp4"
   },
   "patient": {
     "display_name": "The customer",

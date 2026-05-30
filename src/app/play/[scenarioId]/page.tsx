@@ -8,7 +8,7 @@
  */
 import Link from "next/link";
 import { loadScenario } from "@/lib/scenarios/load";
-import { ScenarioPlayer } from "./ScenarioPlayer";
+import { ScenarioPlayerWithIntro } from "./ScenarioPlayerWithIntro";
 
 interface PageProps {
   params: Promise<{ scenarioId: string }>;
@@ -45,5 +45,5 @@ export default async function PlayPage({ params }: PageProps) {
     );
   }
 
-  return <ScenarioPlayer scenario={scenario} />;
+  return <ScenarioPlayerWithIntro scenario={scenario} />;
 }

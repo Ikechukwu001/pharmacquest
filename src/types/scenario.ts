@@ -27,6 +27,7 @@ export interface ScenarioMeta {
   difficulty: Difficulty;
   estimated_minutes: number;
   learning_objectives: string[];
+  intro_video?: string;
 }
 
 // ─── Patient ───────────────────────────────────────────────────────────────
